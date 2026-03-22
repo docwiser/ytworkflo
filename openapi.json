@@ -1,0 +1,5843 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ytworkflo",
+    "description": "\n## \ud83c\udfac ytworkflo \u2014 YouTube Automation Platform\n\nA powerful, fully-typed FastAPI backend for automating YouTube workflows.\n\n### Features\n- \ud83d\udd0d **Search** \u2014 Full-text search with filters, sorting, and pagination\n- \ud83d\udcf9 **Video Info** \u2014 Metadata, stats, formats, chapters, thumbnails\n- \ud83d\udcfa **Channel** \u2014 Channel info, videos, playlists, community posts\n- \ud83c\udfb5 **Audio** \u2014 Extract audio, convert formats, get waveform info\n- \ud83d\udcdd **Transcripts** \u2014 Auto/manual captions, translation, timestamped segments\n- \u2b07\ufe0f **Download** \u2014 Download video/audio with quality selection\n- \ud83d\udd34 **Stream** \u2014 Proxy streaming URLs, live stream detection\n- \ud83d\udcca **Analytics** \u2014 Engagement metrics, estimated reach, performance scores\n- \ud83d\uddbc\ufe0f **Thumbnails** \u2014 Fetch all thumbnail resolutions\n- \ud83d\udcac **Comments** \u2014 Top/recent comments, replies, sentiment\n- \ud83d\udce6 **Batch** \u2014 Bulk operations on multiple videos/channels\n- \ud83d\udd25 **Trending** \u2014 Trending videos by region and category\n- \ud83c\udf10 **Subtitles** \u2014 Download/convert subtitle formats (VTT, SRT, JSON)\n- \ud83d\udccb **Formats** \u2014 List all available formats for a video\n",
+    "contact": {
+      "name": "Susant Swain",
+      "url": "https://susantswain.com/contact"
+    },
+    "license": {
+      "name": "MIT"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/search": {
+      "post": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search YouTube",
+        "description": "Full-text YouTube search with filters, ordering, and pagination.",
+        "operationId": "search_api_v1_search_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search YouTube (GET)",
+        "description": "GET version of search \u2014 pass query as query param.",
+        "operationId": "search_get_api_v1_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Search query",
+              "title": "Q"
+            },
+            "description": "Search query"
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SearchOrder",
+              "default": "relevance"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SearchFilter"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/search/suggest": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search suggestions",
+        "description": "Returns autocomplete suggestions for a query using YouTube's suggestion API.",
+        "operationId": "search_suggestions_api_v1_search_suggest_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Partial query to complete",
+              "title": "Q"
+            },
+            "description": "Partial query to complete"
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language code",
+              "default": "en",
+              "title": "Lang"
+            },
+            "description": "Language code"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Search Suggestions Api V1 Search Suggest Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/search/related/{video_id}": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Related videos",
+        "description": "Fetch videos related to a given video by searching its title and tags.",
+        "operationId": "related_videos_api_v1_search_related__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 30,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Get video info",
+        "description": "Full metadata for a YouTube video including formats, thumbnails, chapters, subtitles.",
+        "operationId": "get_video_api_v1_video__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Video ID or full URL",
+              "title": "Video Id"
+            },
+            "description": "Video ID or full URL"
+          },
+          {
+            "name": "include_formats",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include format list",
+              "default": true,
+              "title": "Include Formats"
+            },
+            "description": "Include format list"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/info": {
+      "post": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Get video info (POST)",
+        "description": "POST-based video info fetch, useful when passing full URLs.",
+        "operationId": "get_video_post_api_v1_video_info_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}/metadata": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Lightweight video metadata",
+        "description": "Returns only core metadata without format list \u2014 faster response.",
+        "operationId": "get_video_metadata_api_v1_video__video_id__metadata_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}/chapters": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Get video chapters",
+        "description": "Returns chapter markers with timestamps.",
+        "operationId": "get_chapters_api_v1_video__video_id__chapters_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {},
+                  "title": "Response Get Chapters Api V1 Video  Video Id  Chapters Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}/heatmap": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Get engagement heatmap",
+        "description": "Returns heatmap data showing most replayed moments.",
+        "operationId": "get_heatmap_api_v1_video__video_id__heatmap_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {},
+                  "title": "Response Get Heatmap Api V1 Video  Video Id  Heatmap Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}/tags": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Get video tags",
+        "operationId": "get_tags_api_v1_video__video_id__tags_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {},
+                  "title": "Response Get Tags Api V1 Video  Video Id  Tags Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}/available-subtitles": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "List available subtitle languages",
+        "description": "Returns all subtitle languages (manual + auto-generated) for a video.",
+        "operationId": "get_available_subtitles_api_v1_video__video_id__available_subtitles_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/video/{video_id}/is-live": {
+      "get": {
+        "tags": [
+          "Video"
+        ],
+        "summary": "Check if video is a live stream",
+        "operationId": "check_live_api_v1_video__video_id__is_live_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/channel/{channel_id}": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "Get channel info",
+        "description": "Fetch channel metadata: subscriber count, description, thumbnails, etc.",
+        "operationId": "get_channel_api_v1_channel__channel_id__get",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Channel ID, @handle, or URL",
+              "title": "Channel Id"
+            },
+            "description": "Channel ID, @handle, or URL"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/channel/{channel_id}/videos": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "Get channel videos",
+        "description": "List videos from a channel with pagination.",
+        "operationId": "get_channel_videos_api_v1_channel__channel_id__videos_get",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Channel Id"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelVideosResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/channel/{channel_id}/playlists": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "Get channel playlists",
+        "operationId": "get_channel_playlists_api_v1_channel__channel_id__playlists_get",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Channel Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/channel/{channel_id}/about": {
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "summary": "Channel about/description",
+        "operationId": "get_channel_about_api_v1_channel__channel_id__about_get",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Channel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlist/{playlist_id}": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "summary": "Get playlist with videos",
+        "description": "Fetch playlist metadata and all video entries.",
+        "operationId": "get_playlist_api_v1_playlist__playlist_id__get",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Playlist ID or URL",
+              "title": "Playlist Id"
+            },
+            "description": "Playlist ID or URL"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistVideosResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlist/info": {
+      "post": {
+        "tags": [
+          "Playlist"
+        ],
+        "summary": "Get playlist info (POST)",
+        "operationId": "get_playlist_post_api_v1_playlist_info_post",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Per Page"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaylistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistVideosResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlist/{playlist_id}/ids": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "summary": "Get playlist video IDs only",
+        "operationId": "get_playlist_ids_api_v1_playlist__playlist_id__ids_get",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Playlist Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/download": {
+      "post": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "Download video/audio",
+        "description": "Download a YouTube video or audio to the server's download directory.",
+        "operationId": "download_video_api_v1_download_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DownloadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/download/url/{video_id}": {
+      "get": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "Get direct download URL",
+        "description": "Returns a direct CDN URL for the video without downloading to server.",
+        "operationId": "get_download_url_api_v1_download_url__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/VideoQuality",
+              "default": "best"
+            }
+          },
+          {
+            "name": "format_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Format Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadURLResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/download/file/{filename}": {
+      "get": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "Serve downloaded file",
+        "description": "Serve a previously downloaded file by filename.",
+        "operationId": "serve_file_api_v1_download_file__filename__get",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "Delete downloaded file",
+        "operationId": "delete_file_api_v1_download_file__filename__delete",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/download/list": {
+      "get": {
+        "tags": [
+          "Download"
+        ],
+        "summary": "List downloaded files",
+        "description": "Lists all files currently in the download directory.",
+        "operationId": "list_downloads_api_v1_download_list_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream/{video_id}": {
+      "get": {
+        "tags": [
+          "Stream"
+        ],
+        "summary": "Get stream info",
+        "description": "Returns direct streaming URL for a video. URL may expire.",
+        "operationId": "get_stream_info_api_v1_stream__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/VideoQuality",
+              "default": "best"
+            }
+          },
+          {
+            "name": "format_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Format Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream/{video_id}/redirect": {
+      "get": {
+        "tags": [
+          "Stream"
+        ],
+        "summary": "Redirect to stream URL",
+        "description": "302 redirect directly to the video stream URL.",
+        "operationId": "redirect_to_stream_api_v1_stream__video_id__redirect_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/VideoQuality",
+              "default": "best"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream/{video_id}/hls": {
+      "get": {
+        "tags": [
+          "Stream"
+        ],
+        "summary": "Get HLS manifest URL",
+        "description": "Returns HLS (.m3u8) manifest URL for adaptive streaming.",
+        "operationId": "get_hls_url_api_v1_stream__video_id__hls_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream/{video_id}/dash": {
+      "get": {
+        "tags": [
+          "Stream"
+        ],
+        "summary": "Get DASH manifest URL",
+        "description": "Returns DASH (.mpd) manifest URL.",
+        "operationId": "get_dash_url_api_v1_stream__video_id__dash_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream/{video_id}/live": {
+      "get": {
+        "tags": [
+          "Stream"
+        ],
+        "summary": "Get live stream info",
+        "description": "Check if a video/channel is live and return live stream URLs.",
+        "operationId": "get_live_stream_api_v1_stream__video_id__live_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveStreamInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/audio/{video_id}/stream": {
+      "get": {
+        "tags": [
+          "Audio"
+        ],
+        "summary": "Get audio stream URL",
+        "description": "Returns direct audio-only streaming URL.",
+        "operationId": "get_audio_stream_api_v1_audio__video_id__stream_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "fmt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AudioFormat",
+              "default": "best"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioStreamInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/audio/extract": {
+      "post": {
+        "tags": [
+          "Audio"
+        ],
+        "summary": "Extract audio to file",
+        "description": "Download and extract audio from a video to the server.",
+        "operationId": "extract_audio_api_v1_audio_extract_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudioExtractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/audio/{video_id}/formats": {
+      "get": {
+        "tags": [
+          "Audio"
+        ],
+        "summary": "List audio-only formats",
+        "description": "Returns only audio formats available for a video.",
+        "operationId": "get_audio_formats_api_v1_audio__video_id__formats_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transcript/{video_id}": {
+      "get": {
+        "tags": [
+          "Transcript"
+        ],
+        "summary": "Get transcript",
+        "description": "Fetches timestamped transcript/caption segments for a video.",
+        "operationId": "get_transcript_api_v1_transcript__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language code",
+              "default": "en",
+              "title": "Language"
+            },
+            "description": "Language code"
+          },
+          {
+            "name": "auto_generated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Auto Generated"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transcript": {
+      "post": {
+        "tags": [
+          "Transcript"
+        ],
+        "summary": "Get transcript (POST)",
+        "operationId": "get_transcript_post_api_v1_transcript_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranscriptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transcript/{video_id}/languages": {
+      "get": {
+        "tags": [
+          "Transcript"
+        ],
+        "summary": "List transcript languages",
+        "operationId": "list_transcript_languages_api_v1_transcript__video_id__languages_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transcript/{video_id}/full-text": {
+      "get": {
+        "tags": [
+          "Transcript"
+        ],
+        "summary": "Get full transcript as plain text",
+        "operationId": "get_full_text_api_v1_transcript__video_id__full_text_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "en",
+              "title": "Language"
+            }
+          },
+          {
+            "name": "auto_generated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Auto Generated"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/thumbnails/{video_id}": {
+      "get": {
+        "tags": [
+          "Thumbnails"
+        ],
+        "summary": "Get all thumbnails",
+        "description": "Returns all thumbnail URLs for a video at every available resolution.",
+        "operationId": "get_thumbnails_api_v1_thumbnails__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThumbnailsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/thumbnails/{video_id}/best": {
+      "get": {
+        "tags": [
+          "Thumbnails"
+        ],
+        "summary": "Get best quality thumbnail URL",
+        "operationId": "get_best_thumbnail_api_v1_thumbnails__video_id__best_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/thumbnails/{video_id}/all-resolutions": {
+      "get": {
+        "tags": [
+          "Thumbnails"
+        ],
+        "summary": "Get standard YouTube thumbnail URLs",
+        "operationId": "get_all_standard_thumbnails_api_v1_thumbnails__video_id__all_resolutions_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/thumbnails/{video_id}/download": {
+      "get": {
+        "tags": [
+          "Thumbnails"
+        ],
+        "summary": "Download thumbnail to server",
+        "operationId": "download_thumbnail_api_v1_thumbnails__video_id__download_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "'maxres','hq','mq','default'",
+              "default": "maxres",
+              "title": "Resolution"
+            },
+            "description": "'maxres','hq','mq','default'"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/{video_id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Video analytics",
+        "description": "Engagement metrics, heatmap, performance score, and top moments.",
+        "operationId": "get_video_analytics_api_v1_analytics__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoAnalytics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/channel/{channel_id}": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Channel analytics",
+        "operationId": "get_channel_analytics_api_v1_analytics_channel__channel_id__get",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Channel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelAnalytics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/{video_id}/compare": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Compare video against channel average",
+        "operationId": "compare_video_to_channel_api_v1_analytics__video_id__compare_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/batch/videos": {
+      "post": {
+        "tags": [
+          "Batch"
+        ],
+        "summary": "Batch get video info",
+        "description": "Fetch metadata for up to 50 videos in one request.",
+        "operationId": "batch_get_videos_api_v1_batch_videos_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchVideoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchVideoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/batch/download": {
+      "post": {
+        "tags": [
+          "Batch"
+        ],
+        "summary": "Batch download",
+        "description": "Queue download for up to 20 videos.",
+        "operationId": "batch_download_api_v1_batch_download_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchDownloadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchDownloadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/batch/transcripts": {
+      "post": {
+        "tags": [
+          "Batch"
+        ],
+        "summary": "Batch get transcripts",
+        "description": "Fetch transcripts for up to 20 videos.",
+        "operationId": "batch_transcripts_api_v1_batch_transcripts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchTranscriptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/formats/{video_id}": {
+      "get": {
+        "tags": [
+          "Formats"
+        ],
+        "summary": "List all formats",
+        "description": "Returns all available download formats for a video.",
+        "operationId": "get_formats_api_v1_formats__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormatsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/formats/filter": {
+      "post": {
+        "tags": [
+          "Formats"
+        ],
+        "summary": "Filter formats",
+        "description": "Get formats matching specific criteria.",
+        "operationId": "filter_formats_api_v1_formats_filter_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormatFilterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {},
+                  "type": "array",
+                  "title": "Response Filter Formats Api V1 Formats Filter Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/formats/{video_id}/video-only": {
+      "get": {
+        "tags": [
+          "Formats"
+        ],
+        "summary": "Video-only formats",
+        "operationId": "video_only_formats_api_v1_formats__video_id__video_only_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/formats/{video_id}/by-ext/{ext}": {
+      "get": {
+        "tags": [
+          "Formats"
+        ],
+        "summary": "Formats by file extension",
+        "operationId": "formats_by_ext_api_v1_formats__video_id__by_ext__ext__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "ext",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "e.g. mp4, webm",
+              "title": "Ext"
+            },
+            "description": "e.g. mp4, webm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/comments/{video_id}": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Get video comments",
+        "description": "Fetches top or recent comments for a video.",
+        "operationId": "get_comments_api_v1_comments__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "'top' or 'new'",
+              "default": "top",
+              "title": "Sort By"
+            },
+            "description": "'top' or 'new'"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/comments": {
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Get comments (POST)",
+        "operationId": "get_comments_post_api_v1_comments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/comments/{video_id}/replies/{comment_id}": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Get comment replies",
+        "operationId": "get_comment_replies_api_v1_comments__video_id__replies__comment_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Comment Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/comments/{video_id}/pinned": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Get pinned comment",
+        "operationId": "get_pinned_comment_api_v1_comments__video_id__pinned_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trending": {
+      "get": {
+        "tags": [
+          "Trending"
+        ],
+        "summary": "Get trending videos",
+        "description": "Fetch currently trending YouTube videos by region and category.",
+        "operationId": "get_trending_api_v1_trending_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "ISO 3166-1 alpha-2 region code, e.g. 'US', 'IN', 'GB'",
+              "default": "US",
+              "title": "Region"
+            },
+            "description": "ISO 3166-1 alpha-2 region code, e.g. 'US', 'IN', 'GB'"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/TrendingCategory",
+              "default": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trending/regions": {
+      "get": {
+        "tags": [
+          "Trending"
+        ],
+        "summary": "List supported trending regions",
+        "operationId": "list_regions_api_v1_trending_regions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trending/categories": {
+      "get": {
+        "tags": [
+          "Trending"
+        ],
+        "summary": "List trending categories",
+        "operationId": "list_categories_api_v1_trending_categories_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subtitles/{video_id}": {
+      "get": {
+        "tags": [
+          "Subtitles"
+        ],
+        "summary": "Get subtitle content",
+        "description": "Fetch subtitle/caption content for a video in the requested format.",
+        "operationId": "get_subtitles_api_v1_subtitles__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language code, e.g. 'en', 'hi', 'es'",
+              "default": "en",
+              "title": "Language"
+            },
+            "description": "Language code, e.g. 'en', 'hi', 'es'"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SubtitleFormat",
+              "default": "srt"
+            }
+          },
+          {
+            "name": "auto_generated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Allow auto-generated captions",
+              "default": true,
+              "title": "Auto Generated"
+            },
+            "description": "Allow auto-generated captions"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubtitleContentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subtitles/download": {
+      "post": {
+        "tags": [
+          "Subtitles"
+        ],
+        "summary": "Download subtitle file",
+        "description": "Download subtitle file to server and return file info.",
+        "operationId": "download_subtitle_api_v1_subtitles_download_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubtitleDownloadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubtitleDownloadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subtitles/{video_id}/file": {
+      "get": {
+        "tags": [
+          "Subtitles"
+        ],
+        "summary": "Serve subtitle as downloadable file",
+        "description": "Returns subtitle as a raw file download.",
+        "operationId": "serve_subtitle_file_api_v1_subtitles__video_id__file_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "en",
+              "title": "Language"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SubtitleFormat",
+              "default": "srt"
+            }
+          },
+          {
+            "name": "auto_generated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Auto Generated"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subtitles/{video_id}/available": {
+      "get": {
+        "tags": [
+          "Subtitles"
+        ],
+        "summary": "List available subtitles",
+        "description": "Returns all available subtitle languages for a video.",
+        "operationId": "list_available_subtitles_api_v1_subtitles__video_id__available_get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health check",
+        "description": "Returns platform health status.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AudioExtractRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "format": {
+            "$ref": "#/components/schemas/AudioFormat",
+            "default": "mp3"
+          },
+          "quality": {
+            "type": "string",
+            "title": "Quality",
+            "description": "Bitrate in kbps, e.g. '192', '320', 'best'",
+            "default": "192"
+          },
+          "start_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Time",
+            "description": "Trim start (seconds)"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time",
+            "description": "Trim end (seconds)"
+          },
+          "normalize": {
+            "type": "boolean",
+            "title": "Normalize",
+            "description": "Normalize audio volume",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "AudioExtractRequest"
+      },
+      "AudioFormat": {
+        "type": "string",
+        "enum": [
+          "mp3",
+          "aac",
+          "opus",
+          "flac",
+          "wav",
+          "m4a",
+          "vorbis",
+          "best"
+        ],
+        "title": "AudioFormat"
+      },
+      "AudioInfo": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "filepath": {
+            "type": "string",
+            "title": "Filepath"
+          },
+          "format": {
+            "type": "string",
+            "title": "Format"
+          },
+          "bitrate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Rate"
+          },
+          "channels": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channels"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "filesize": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filesize"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "filename",
+          "filepath",
+          "format"
+        ],
+        "title": "AudioInfo"
+      },
+      "AudioStreamInfo": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "stream_url": {
+            "type": "string",
+            "title": "Stream Url"
+          },
+          "ext": {
+            "type": "string",
+            "title": "Ext"
+          },
+          "abr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Abr"
+          },
+          "asr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asr"
+          },
+          "acodec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acodec"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "stream_url",
+          "ext"
+        ],
+        "title": "AudioStreamInfo"
+      },
+      "BatchDownloadRequest": {
+        "properties": {
+          "video_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Video Ids"
+          },
+          "quality": {
+            "$ref": "#/components/schemas/VideoQuality",
+            "default": "best"
+          },
+          "audio_only": {
+            "type": "boolean",
+            "title": "Audio Only",
+            "default": false
+          },
+          "audio_format": {
+            "$ref": "#/components/schemas/AudioFormat",
+            "default": "mp3"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_ids"
+        ],
+        "title": "BatchDownloadRequest"
+      },
+      "BatchDownloadResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "requested": {
+            "type": "integer",
+            "title": "Requested"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DownloadResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "requested",
+          "status",
+          "items"
+        ],
+        "title": "BatchDownloadResponse"
+      },
+      "BatchTranscriptRequest": {
+        "properties": {
+          "video_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Video Ids"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "default": "en"
+          },
+          "auto_generated": {
+            "type": "boolean",
+            "title": "Auto Generated",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_ids"
+        ],
+        "title": "BatchTranscriptRequest"
+      },
+      "BatchVideoRequest": {
+        "properties": {
+          "video_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Video Ids"
+          },
+          "include_formats": {
+            "type": "boolean",
+            "title": "Include Formats",
+            "description": "Include format list in response",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_ids"
+        ],
+        "title": "BatchVideoRequest"
+      },
+      "BatchVideoResponse": {
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "title": "Requested"
+          },
+          "succeeded": {
+            "type": "integer",
+            "title": "Succeeded"
+          },
+          "failed": {
+            "type": "integer",
+            "title": "Failed"
+          },
+          "results": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/VideoInfo"
+                },
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requested",
+          "succeeded",
+          "failed",
+          "results"
+        ],
+        "title": "BatchVideoResponse"
+      },
+      "ChannelAnalytics": {
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "title": "Channel Id"
+          },
+          "channel_name": {
+            "type": "string",
+            "title": "Channel Name"
+          },
+          "subscriber_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscriber Count"
+          },
+          "total_views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Views"
+          },
+          "video_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Video Count"
+          },
+          "avg_views_per_video": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Views Per Video"
+          },
+          "estimated_monthly_views": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Monthly Views"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channel_id",
+          "channel_name"
+        ],
+        "title": "ChannelAnalytics"
+      },
+      "ChannelInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "subscriber_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscriber Count"
+          },
+          "video_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Video Count"
+          },
+          "view_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Count"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "joined_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Joined Date"
+          },
+          "thumbnails": {
+            "items": {
+              "$ref": "#/components/schemas/ThumbnailItem"
+            },
+            "type": "array",
+            "title": "Thumbnails",
+            "default": []
+          },
+          "banners": {
+            "items": {
+              "$ref": "#/components/schemas/ThumbnailItem"
+            },
+            "type": "array",
+            "title": "Banners",
+            "default": []
+          },
+          "channel_tabs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Channel Tabs",
+            "default": []
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "default": []
+          },
+          "is_verified": {
+            "type": "boolean",
+            "title": "Is Verified",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "url"
+        ],
+        "title": "ChannelInfo"
+      },
+      "ChannelVideosResponse": {
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "title": "Channel Id"
+          },
+          "channel_name": {
+            "type": "string",
+            "title": "Channel Name"
+          },
+          "videos": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResultItem"
+            },
+            "type": "array",
+            "title": "Videos"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginatedMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channel_id",
+          "channel_name",
+          "videos",
+          "meta"
+        ],
+        "title": "ChannelVideosResponse"
+      },
+      "Chapter": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "start_time": {
+            "type": "number",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "start_time"
+        ],
+        "title": "Chapter"
+      },
+      "CommentItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "author_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          },
+          "like_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Like Count"
+          },
+          "reply_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply Count"
+          },
+          "is_pinned": {
+            "type": "boolean",
+            "title": "Is Pinned",
+            "default": false
+          },
+          "is_favorited": {
+            "type": "boolean",
+            "title": "Is Favorited",
+            "default": false
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "author",
+          "text"
+        ],
+        "title": "CommentItem"
+      },
+      "CommentsRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "sort_by": {
+            "type": "string",
+            "title": "Sort By",
+            "description": "'top' or 'new'",
+            "default": "top"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 20
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "CommentsRequest"
+      },
+      "CommentsResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "comment_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment Count"
+          },
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentItem"
+            },
+            "type": "array",
+            "title": "Comments"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginatedMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "comments",
+          "meta"
+        ],
+        "title": "CommentsResponse"
+      },
+      "DownloadRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id",
+            "description": "Video ID or URL"
+          },
+          "quality": {
+            "$ref": "#/components/schemas/VideoQuality",
+            "description": "Video quality",
+            "default": "best"
+          },
+          "format_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format Id",
+            "description": "Specific format ID to download"
+          },
+          "audio_only": {
+            "type": "boolean",
+            "title": "Audio Only",
+            "description": "Download audio only",
+            "default": false
+          },
+          "audio_format": {
+            "$ref": "#/components/schemas/AudioFormat",
+            "description": "Audio format if audio_only",
+            "default": "mp3"
+          },
+          "embed_subs": {
+            "type": "boolean",
+            "title": "Embed Subs",
+            "description": "Embed subtitles into video",
+            "default": false
+          },
+          "embed_thumbnail": {
+            "type": "boolean",
+            "title": "Embed Thumbnail",
+            "description": "Embed thumbnail into file",
+            "default": false
+          },
+          "add_metadata": {
+            "type": "boolean",
+            "title": "Add Metadata",
+            "description": "Add metadata tags",
+            "default": true
+          },
+          "subtitle_lang": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle Lang",
+            "description": "Subtitle language code to embed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "DownloadRequest"
+      },
+      "DownloadResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "filepath": {
+            "type": "string",
+            "title": "Filepath"
+          },
+          "filesize": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filesize"
+          },
+          "format": {
+            "type": "string",
+            "title": "Format"
+          },
+          "ext": {
+            "type": "string",
+            "title": "Ext"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "video_id",
+          "title",
+          "filename",
+          "filepath",
+          "format",
+          "ext",
+          "status"
+        ],
+        "title": "DownloadResponse"
+      },
+      "DownloadURLResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "direct_url": {
+            "type": "string",
+            "title": "Direct Url"
+          },
+          "ext": {
+            "type": "string",
+            "title": "Ext"
+          },
+          "format_id": {
+            "type": "string",
+            "title": "Format Id"
+          },
+          "filesize": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filesize"
+          },
+          "expires_approx": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires Approx"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "direct_url",
+          "ext",
+          "format_id"
+        ],
+        "title": "DownloadURLResponse"
+      },
+      "EngagementMetrics": {
+        "properties": {
+          "view_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Count"
+          },
+          "like_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Like Count"
+          },
+          "comment_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment Count"
+          },
+          "like_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Like Ratio"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Rate"
+          },
+          "views_per_day": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views Per Day"
+          },
+          "estimated_reach": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Reach"
+          }
+        },
+        "type": "object",
+        "title": "EngagementMetrics"
+      },
+      "FormatFilterRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "ext": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ext",
+            "description": "Filter by extension, e.g. 'mp4', 'webm'"
+          },
+          "min_height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Height"
+          },
+          "max_height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Height"
+          },
+          "has_video": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Video"
+          },
+          "has_audio": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Audio"
+          },
+          "min_fps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Fps"
+          },
+          "vcodec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vcodec"
+          },
+          "acodec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acodec"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "FormatFilterRequest"
+      },
+      "FormatsResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "formats": {
+            "items": {
+              "$ref": "#/components/schemas/VideoFormat"
+            },
+            "type": "array",
+            "title": "Formats"
+          },
+          "best_video": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VideoFormat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "best_audio": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VideoFormat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "best_combined": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VideoFormat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "formats"
+        ],
+        "title": "FormatsResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Heatmap": {
+        "properties": {
+          "start_time": {
+            "type": "number",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "number",
+            "title": "End Time"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_time",
+          "end_time",
+          "value"
+        ],
+        "title": "Heatmap"
+      },
+      "LiveStreamInfo": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "is_live": {
+            "type": "boolean",
+            "title": "Is Live"
+          },
+          "stream_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stream Url"
+          },
+          "hls_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hls Url"
+          },
+          "dash_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dash Url"
+          },
+          "concurrent_viewers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concurrent Viewers"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "is_live"
+        ],
+        "title": "LiveStreamInfo"
+      },
+      "PaginatedMeta": {
+        "properties": {
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "page",
+          "per_page"
+        ],
+        "title": "PaginatedMeta"
+      },
+      "PlaylistInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "channel_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Name"
+          },
+          "view_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Count"
+          },
+          "modified_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modified Date"
+          },
+          "entry_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Count"
+          },
+          "thumbnails": {
+            "items": {
+              "$ref": "#/components/schemas/ThumbnailItem"
+            },
+            "type": "array",
+            "title": "Thumbnails",
+            "default": []
+          },
+          "availability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "url"
+        ],
+        "title": "PlaylistInfo"
+      },
+      "PlaylistRequest": {
+        "properties": {
+          "playlist_id": {
+            "type": "string",
+            "title": "Playlist Id",
+            "description": "Playlist ID or full URL"
+          }
+        },
+        "type": "object",
+        "required": [
+          "playlist_id"
+        ],
+        "title": "PlaylistRequest"
+      },
+      "PlaylistVideosResponse": {
+        "properties": {
+          "playlist": {
+            "$ref": "#/components/schemas/PlaylistInfo"
+          },
+          "videos": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResultItem"
+            },
+            "type": "array",
+            "title": "Videos"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginatedMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "playlist",
+          "videos",
+          "meta"
+        ],
+        "title": "PlaylistVideosResponse"
+      },
+      "SearchFilter": {
+        "type": "string",
+        "enum": [
+          "video",
+          "channel",
+          "playlist",
+          "movie",
+          "live"
+        ],
+        "title": "SearchFilter"
+      },
+      "SearchOrder": {
+        "type": "string",
+        "enum": [
+          "relevance",
+          "date",
+          "views",
+          "rating",
+          "title"
+        ],
+        "title": "SearchOrder"
+      },
+      "SearchRequest": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Query",
+            "description": "Search query"
+          },
+          "filter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SearchFilter"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter result type"
+          },
+          "order": {
+            "$ref": "#/components/schemas/SearchOrder",
+            "description": "Sort order",
+            "default": "relevance"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language",
+            "description": "ISO 639-1 language code, e.g. 'en'"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region",
+            "description": "ISO 3166-1 alpha-2 region code, e.g. 'US'"
+          },
+          "safe_search": {
+            "type": "boolean",
+            "title": "Safe Search",
+            "description": "Enable safe search",
+            "default": false
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page",
+            "default": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Per Page",
+            "default": 20
+          }
+        },
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "SearchRequest"
+      },
+      "SearchResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResultItem"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginatedMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "results",
+          "meta"
+        ],
+        "title": "SearchResponse"
+      },
+      "SearchResultItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "channel_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Name"
+          },
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "view_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Count"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "duration_string": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration String"
+          },
+          "is_live": {
+            "type": "boolean",
+            "title": "Is Live",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "title",
+          "url"
+        ],
+        "title": "SearchResultItem"
+      },
+      "StreamInfo": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "stream_url": {
+            "type": "string",
+            "title": "Stream Url"
+          },
+          "ext": {
+            "type": "string",
+            "title": "Ext"
+          },
+          "format_id": {
+            "type": "string",
+            "title": "Format Id"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "fps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fps"
+          },
+          "tbr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tbr"
+          },
+          "is_live": {
+            "type": "boolean",
+            "title": "Is Live",
+            "default": false
+          },
+          "manifest_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manifest Url"
+          },
+          "hls_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hls Url"
+          },
+          "dash_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dash Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "stream_url",
+          "ext",
+          "format_id"
+        ],
+        "title": "StreamInfo"
+      },
+      "Subtitle": {
+        "properties": {
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "language_code": {
+            "type": "string",
+            "title": "Language Code"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "is_auto_generated": {
+            "type": "boolean",
+            "title": "Is Auto Generated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "language",
+          "language_code"
+        ],
+        "title": "Subtitle"
+      },
+      "SubtitleContentResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "format": {
+            "type": "string",
+            "title": "Format"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptSegment"
+            },
+            "type": "array",
+            "title": "Segments",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "language",
+          "format",
+          "content"
+        ],
+        "title": "SubtitleContentResponse"
+      },
+      "SubtitleDownloadRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "description": "Language code",
+            "default": "en"
+          },
+          "format": {
+            "$ref": "#/components/schemas/SubtitleFormat",
+            "description": "Output format",
+            "default": "srt"
+          },
+          "auto_generated": {
+            "type": "boolean",
+            "title": "Auto Generated",
+            "description": "Allow auto-generated captions",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "SubtitleDownloadRequest"
+      },
+      "SubtitleDownloadResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "format": {
+            "type": "string",
+            "title": "Format"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "filepath": {
+            "type": "string",
+            "title": "Filepath"
+          },
+          "content_preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Preview",
+            "description": "First 500 chars of subtitle"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "language",
+          "format",
+          "filename",
+          "filepath"
+        ],
+        "title": "SubtitleDownloadResponse"
+      },
+      "SubtitleFormat": {
+        "type": "string",
+        "enum": [
+          "vtt",
+          "srt",
+          "json3",
+          "ass",
+          "ttml",
+          "srv1",
+          "srv2",
+          "srv3"
+        ],
+        "title": "SubtitleFormat"
+      },
+      "ThumbnailItem": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "ThumbnailItem"
+      },
+      "ThumbnailsResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "thumbnails": {
+            "items": {
+              "$ref": "#/components/schemas/ThumbnailItem"
+            },
+            "type": "array",
+            "title": "Thumbnails"
+          },
+          "best": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ThumbnailItem"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "thumbnails"
+        ],
+        "title": "ThumbnailsResponse"
+      },
+      "TranscriptListResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "available_languages": {
+            "items": {
+              "$ref": "#/components/schemas/Subtitle"
+            },
+            "type": "array",
+            "title": "Available Languages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "available_languages"
+        ],
+        "title": "TranscriptListResponse"
+      },
+      "TranscriptRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "description": "Language code, e.g. 'en', 'hi'",
+            "default": "en"
+          },
+          "auto_generated": {
+            "type": "boolean",
+            "title": "Auto Generated",
+            "description": "Allow auto-generated captions",
+            "default": true
+          },
+          "translate_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translate To",
+            "description": "Translate transcript to language code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "TranscriptRequest"
+      },
+      "TranscriptResponse": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "language_code": {
+            "type": "string",
+            "title": "Language Code"
+          },
+          "is_auto_generated": {
+            "type": "boolean",
+            "title": "Is Auto Generated"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptSegment"
+            },
+            "type": "array",
+            "title": "Segments"
+          },
+          "full_text": {
+            "type": "string",
+            "title": "Full Text"
+          },
+          "translated_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translated To"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "language",
+          "language_code",
+          "is_auto_generated",
+          "segments",
+          "full_text"
+        ],
+        "title": "TranscriptResponse"
+      },
+      "TranscriptSegment": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "start": {
+            "type": "number",
+            "title": "Start"
+          },
+          "duration": {
+            "type": "number",
+            "title": "Duration"
+          },
+          "end": {
+            "type": "number",
+            "title": "End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "start",
+          "duration",
+          "end"
+        ],
+        "title": "TranscriptSegment"
+      },
+      "TrendingCategory": {
+        "type": "string",
+        "enum": [
+          "0",
+          "10",
+          "20",
+          "30",
+          "25",
+          "17",
+          "28"
+        ],
+        "title": "TrendingCategory"
+      },
+      "TrendingResponse": {
+        "properties": {
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "videos": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResultItem"
+            },
+            "type": "array",
+            "title": "Videos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "region",
+          "category",
+          "fetched_at",
+          "videos"
+        ],
+        "title": "TrendingResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VideoAnalytics": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "upload_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upload Date"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "age_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Days"
+          },
+          "engagement": {
+            "$ref": "#/components/schemas/EngagementMetrics"
+          },
+          "heatmap": {
+            "items": {
+              "$ref": "#/components/schemas/Heatmap"
+            },
+            "type": "array",
+            "title": "Heatmap",
+            "default": []
+          },
+          "top_moments": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Top Moments",
+            "default": []
+          },
+          "performance_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Performance Score"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "default": []
+          },
+          "categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Categories",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id",
+          "title",
+          "engagement"
+        ],
+        "title": "VideoAnalytics"
+      },
+      "VideoFormat": {
+        "properties": {
+          "format_id": {
+            "type": "string",
+            "title": "Format Id"
+          },
+          "ext": {
+            "type": "string",
+            "title": "Ext"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "fps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fps"
+          },
+          "vcodec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vcodec"
+          },
+          "acodec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acodec"
+          },
+          "filesize": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filesize"
+          },
+          "filesize_approx": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filesize Approx"
+          },
+          "tbr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tbr"
+          },
+          "vbr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vbr"
+          },
+          "abr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Abr"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "protocol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Protocol"
+          },
+          "format_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Format Note"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          },
+          "has_video": {
+            "type": "boolean",
+            "title": "Has Video",
+            "default": false
+          },
+          "has_audio": {
+            "type": "boolean",
+            "title": "Has Audio",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "format_id",
+          "ext"
+        ],
+        "title": "VideoFormat"
+      },
+      "VideoInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "duration_string": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration String"
+          },
+          "view_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Count"
+          },
+          "like_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Like Count"
+          },
+          "comment_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment Count"
+          },
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "channel_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Name"
+          },
+          "channel_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Url"
+          },
+          "channel_follower_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Follower Count"
+          },
+          "upload_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upload Date"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          },
+          "is_live": {
+            "type": "boolean",
+            "title": "Is Live",
+            "default": false
+          },
+          "was_live": {
+            "type": "boolean",
+            "title": "Was Live",
+            "default": false
+          },
+          "categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Categories",
+            "default": []
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags",
+            "default": []
+          },
+          "age_limit": {
+            "type": "integer",
+            "title": "Age Limit",
+            "default": 0
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "thumbnails": {
+            "items": {
+              "$ref": "#/components/schemas/ThumbnailItem"
+            },
+            "type": "array",
+            "title": "Thumbnails",
+            "default": []
+          },
+          "chapters": {
+            "items": {
+              "$ref": "#/components/schemas/Chapter"
+            },
+            "type": "array",
+            "title": "Chapters",
+            "default": []
+          },
+          "subtitles": {
+            "additionalProperties": {
+              "items": {},
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Subtitles",
+            "default": {}
+          },
+          "automatic_captions": {
+            "additionalProperties": {
+              "items": {},
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Automatic Captions",
+            "default": {}
+          },
+          "heatmap": {
+            "items": {
+              "$ref": "#/components/schemas/Heatmap"
+            },
+            "type": "array",
+            "title": "Heatmap",
+            "default": []
+          },
+          "formats": {
+            "items": {
+              "$ref": "#/components/schemas/VideoFormat"
+            },
+            "type": "array",
+            "title": "Formats",
+            "default": []
+          },
+          "webpage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webpage Url"
+          },
+          "extractor": {
+            "type": "string",
+            "title": "Extractor",
+            "default": "youtube"
+          },
+          "availability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "url"
+        ],
+        "title": "VideoInfo"
+      },
+      "VideoQuality": {
+        "type": "string",
+        "enum": [
+          "best",
+          "worst",
+          "2160p",
+          "1440p",
+          "1080p",
+          "720p",
+          "480p",
+          "360p",
+          "240p",
+          "144p"
+        ],
+        "title": "VideoQuality"
+      },
+      "VideoRequest": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id",
+            "description": "YouTube video ID or full URL"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video_id"
+        ],
+        "title": "VideoRequest"
+      }
+    }
+  }
+}
