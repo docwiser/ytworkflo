@@ -13,7 +13,7 @@ echo "📘 ReDoc       → http://localhost:$PORT/redoc"
 echo "🔌 OpenAPI JSON→ http://localhost:$PORT/openapi.json"
 echo ""
 
-uvicorn app.main:app \
+python3 -m uvicorn app.main:app \
   --host "$HOST" \
   --port "$PORT" \
   ${RELOAD:+--reload} \
